@@ -1,7 +1,8 @@
-bin/
-obj/
-Properties/
-Debug/
+bak
+obj
+bin
+Properties
 *.bak
+*.suo
 *.user
 *.config
