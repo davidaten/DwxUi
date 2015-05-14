@@ -15,7 +15,7 @@ function CallbackSet(fun, obj, tag) {
     cb_obj.CbTag = tag;
     return cb_obj;
 }
-function Str2Int(str,radio) {
+function Str2Int(str, radio) {
 
     if (arguments.lenth < 1) {
         str = "0";
@@ -26,7 +26,7 @@ function Str2Int(str,radio) {
     if (arguments.lenth < 2) {
         radio = 10;
     }
-    
+
     var value = parseInt(str, radio);
     return value;
 }
@@ -73,8 +73,8 @@ function StrCap(str) {
 
     //return str.substr(0, 1).toUpperCase() + str.substr(1).toLowerCase();
 }
-function StrSub(str,off,len) {
-    return str.substring(off,off+len);
+function StrSub(str, off, len) {
+    return str.substring(off, off + len);
 }
 
 function HtmlRgb(r, g, b) {
@@ -113,20 +113,20 @@ function StrCodeDbg(str) {
 
 function ElementReplace(obj) {
 
-	var old = document.getElementById(obj.id);
+    var old = document.getElementById(obj.id);
     old.parentElement.replaceChild(obj, old);
 }
 function ElementEmpty(id) {
 
-	var old = document.getElementById(id);
+    var old = document.getElementById(id);
     old.innerHTML = "";
 }
 
-function ElementWalk(node,cb_obj){
+function ElementWalk(node, cb_obj) {
 
     if (node.nodeType == 1) {
 
-        cb_obj.CbFun(cb_obj.CbObj,cb_obj.CbTag,node);
+        cb_obj.CbFun(cb_obj.CbObj, cb_obj.CbTag, node);
 
         node = node.firstChild;
         while (node) {
@@ -148,7 +148,7 @@ function removeAllChildren(theParent) {
     rangeObj.deleteContents();
 }
 
-function DwxUiCssAry (){
+function DwxUiCssAry() {
     var obj = {};
     obj.Ary = [];
     obj.Add = function (name, value) {
@@ -158,10 +158,10 @@ function DwxUiCssAry (){
         this.Ary.push(name);
         this.Ary.push(value);
     }
-    obj.Fix = function (name, value) {
+    obj.Set = function (name, value) {
         name = name.trim();
         value = value.trim();
-        for (var i = 0; i < this.Ary.length; i+=2) {
+        for (var i = 0; i < this.Ary.length; i += 2) {
             if (this.Ary[i] != name)
                 continue;
             this.Ary[i + 1] = value;
@@ -171,12 +171,12 @@ function DwxUiCssAry (){
         this.Ary.push(value);
         return 0;
     }
-    obj.Get = function CssAryGet() {
+    obj.Make = function () {
         var str = "";
         for (var i = 0; i < this.Ary.length; i += 2) {
-            str+=this.Ary[i];
-            str+= ":";
-            str+=this.Ary[i+1];
+            str += this.Ary[i];
+            str += ":";
+            str += this.Ary[i + 1];
             str += ";";
         }
         return str;

@@ -2,99 +2,58 @@ DwxUiBtnPlus = {};
 
 DwxUiBtnPlus.ObjInit = function () {
     var obj = {};
+    //SecWidth for char Icon, SecWidth&SecHeight for image
+    obj.SecWidth = 16;
+    obj.SecHeight = 20;
 
-    obj.FontSize = 16;
-    obj.LineHeight = 20;
-    obj.ColorStr = "hsl(0,0%,100%)";
-    obj.BkColorStr = "#428bca";//"hsl(0,0%,100%)";
-    obj.ItemMarginStr = "0px";
-    obj.ItemPaddingStr = "5px 10px";
-    obj.ItemBdNum = 1;
-    obj.ItemBdType = "solid";
-
-    obj.WrapCssInit = function () {
-        this.WrapCss = DwxUiCssAry();
-        this.WrapCss.Add("box-sizing", "border-box");
-        this.WrapCss.Add("display", "inline-block");
-        this.WrapCss.Add("vertical-align", "middle");
-        this.WrapCss.Add("font-size", sprintf("%spx",Int2Str(this.FontSize)));
-        this.WrapCss.Add("line-height", sprintf("%spx",Int2Str(this.LineHeight)));
-
-        var fc = this.ColorStr;
-        var bc = this.BkColorStr;
-        if (this.Selected) {
-            fc = this.BkColorStr;
-            bc = this.ColorStr;
-        }
-        this.WrapCss.Add("color", fc);
-        this.WrapCss.Add("background-color", bc);
-
-        //var bdc = bc;
-        //if (this.Hovered)
-        //    bdc = fc;
-        //ary.push(sprintf("border: %spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
+    obj.prototype = {};
+    obj.prototype.WrapDiv = null;
+    obj.WrapCss = DwxUiCssAry();
+    obj.WrapCssSet = function () {
+        this.WrapCss.Set("box-sizing", "border-box");
+        this.WrapCss.Set("display", "inline-block");
+        this.WrapCss.Set("vertical-align", "middle");
     };
+    obj.WrapCssSet();
 
     obj.SecAry = [];
-    obj.SecAdd = function (type,value,tag) {
+    obj.SecCssSet = function (sec_obj) {
+        sec_obj.Css.Set("display", "inline-block");
+        sec_obj.Css.Set("box-sizing", "content-box");
+        sec_obj.Css.Set("margin", "0px");
+        sec_obj.Css.Set("border", "0px solid black");
+        sec_obj.Css.Set("padding", "0px");
+        sec_obj.Css.Set("vertical-align", "middle");
+        sec_obj.Css.Set("text-align", "center");
+    };
+    obj.SecAdd = function (type, value, tag) {
         var sec_obj = {};
         sec_obj.Type = type;
         sec_obj.Value = value;
-        /*
-        switch (type) {
-            case "Check":
-                sec_obj.Color = "hsl(127, 100%, 40%)";
-                sec_obj.State = 0;
-                break;
-            case "Expand":
-                sec_obj.Color = "hsl(4, 100%, 45%)";
-                sec_obj.State = 0;
-                break;
-            case "Text":
-                break;
-            default:
-        };
-        */
         if (tag)
             sec_obj.Tag = tag;
         else
             sec_obj.Tag = this.SecAry.length;
         sec_obj.Hovered = 0;
-        this.SecCssInit(sec_obj);
+        sec_obj.Css = DwxUiCssAry();
+        this.SecCssSet(sec_obj);
         sec_obj.Div = null;
         this.SecAry.push(sec_obj);
         return sec_obj;
     }
 
-    obj.SecCssInit = function (sec_obj) {
-        sec_obj.Css = DwxUiCssAry();
-
-        sec_obj.Css.Add("display", "inline-block");
-        sec_obj.Css.Add("box-sizing", "content-box");
-        //sec_obj.Css.Add(sprintf("width", "%dpx",sec_obj.FontSize));
-        sec_obj.Css.Add("margin", "0px");
-        sec_obj.Css.Add("border", "0px solid black");
-        //sec_obj.Css.Add("border-radius", "6px 6px 6px 6px"); 
-        sec_obj.Css.Add("padding", "0px");
-        sec_obj.Css.Add("vertical-align", "middle");
-        sec_obj.Css.Add("text-align", "center");
-
-    };
-
     obj.DivImgMake = function (sec_obj) {
         var div = document.createElement('div');
-        div.innerHTML = sprintf('<img src="%s"/>',sec_obj.Value);
-        //sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
-
         sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
+        div.innerHTML = sprintf('<img src="%s"/>', sec_obj.Value);
+        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        sec_obj.Css.Set("height", sprintf("%spx", Int2Str(this.SecHeight)));
+        div.style.cssText = sec_obj.Css.Make();
         return div;
     }
-
-
     obj.DivSubMake = function (sec_obj) {
         var div = document.createElement('div');
+        sec_obj.Div = div;
         switch (sec_obj.Value) {
             case 0:
                 div.innerHTML = "\u00A0";//empty
@@ -109,16 +68,13 @@ DwxUiBtnPlus.ObjInit = function () {
                 //ary.push("color: hsl(4, 100%, 45%)");
                 break;
         };
-        sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
+        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        div.style.cssText = sec_obj.Css.Make();
         return div;
     }
-
     obj.DivCheckMake = function (sec_obj) {
-        
         var div = document.createElement('div');
+        sec_obj.Div = div;
         switch (sec_obj.Value) {
             case 0:
                 div.innerHTML = "\u2610";//box=2610
@@ -133,20 +89,16 @@ DwxUiBtnPlus.ObjInit = function () {
                 //ary.push("color: hsl(4, 100%, 45%)");
                 break;
         };
-        sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
+        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        div.style.cssText = sec_obj.Css.Make();
         return div;
     }
     obj.DivTextMake = function (sec_obj) {
-
         var div = document.createElement('div');
-        div.innerHTML = sec_obj.Value;
-        sec_obj.Css.Fix("text-align", "left");
-        div.style.cssText = sec_obj.Css.Get();;
         sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
+        div.innerHTML = sec_obj.Value;
+        sec_obj.Css.Set("text-align", "left");
+        div.style.cssText = sec_obj.Css.Make();;
         return div;
     }
 
@@ -184,7 +136,7 @@ DwxUiBtnPlus.ObjInit = function () {
     obj.MsDnEvt = function (sec_obj) {
         if (this.MsDnCb) {
             //var this_obj=this.MsDnCb.CbObj;
-            this.MsDnCb.CbFun(this.MsDnCb.CbObj, this.MsDnCb.CbTag, sec_obj.Tag);
+            this.MsDnCb.CbFun(this.MsDnCb.CbObj, this.MsDnCb.CbTag, sec_obj);
         }
         else {
 
@@ -209,7 +161,6 @@ DwxUiBtnPlus.ObjInit = function () {
             case "Img":
                 this.DivImgMake(sec_obj);
                 break;
-
             case "Check":
                 this.DivCheckMake(sec_obj);
                 break;
@@ -228,18 +179,20 @@ DwxUiBtnPlus.ObjInit = function () {
 
     obj.DivMake = function () {
         var div;
-        div=document.createElement('div');
-        div.style.cssText = this.WrapCss.Get();
+        div = document.createElement('div');
         this.WrapDiv = div;
 
         for (var i = 0; i < this.SecAry.length; i++) {
             var sec_obj = this.SecAry[i];
             this.DivSecMake(sec_obj);
         }
+
+        div.style.cssText = this.WrapCss.Make();
+
         return this.WrapDiv;
     }
 
-    obj.WrapCssInit();
+    //obj.WrapCssInit();
     return obj;
 }
 DwxUiBtnPlus.DemoLoad = function () {
@@ -248,7 +201,10 @@ DwxUiBtnPlus.DemoLoad = function () {
     document.body.appendChild(div);
 
     var test = DwxUiBtnPlus.ObjInit();
-    test.WrapCss.Fix("display", "block");
+    test.WrapCss.Set("display", "block");
+    test.SecWidth = 16;
+    //test.WrapCss.Add("font-size", sprintf("%spx",Int2Str(test.SecWidth)));
+    //test.WrapCss.Add("line-height", sprintf("%spx",Int2Str(this.LineHeight)));
     test.SecAdd("Img", "ftv2node.gif", 0);
     test.SecAdd("Sub", 1, 0);
     test.SecAdd("Check", 1, 1);
@@ -256,9 +212,9 @@ DwxUiBtnPlus.DemoLoad = function () {
     test.DivMake();
     document.body.appendChild(test.WrapDiv);
     var test = DwxUiBtnPlus.ObjInit();
-    test.WrapCss.Fix("display", "block");
+    test.WrapCss.Set("display", "block");
     test.SecAdd("Sub", 0, 0);
-    test.SecAry[0].Css.Fix("margin",sprintf("0 %spx 0 0",Int2Str(test.FontSize)));
+    test.SecAry[0].Css.Set("margin", sprintf("0 %spx 0 0", Int2Str(test.SecWidth * 2)));
     test.SecAdd("Check", 1, 1);
     test.SecAdd("Text", "Level 1", 2);
     test.DivMake();

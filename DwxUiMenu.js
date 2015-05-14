@@ -21,21 +21,27 @@ DwxUiMenu.ObjInit = function () {
     obj.ItemAryAdd = function (ary) {
 
         for (var i = 0; i < ary.length; i++) {
-            this.ItemAdd(ary[i]);
+            var btn_obj=DwxUiBtnPlus.ObjInit();
+            btn_obj.SecAdd("Text", ary[i], ary[i]);
+            this.ItemAdd(btn_obj,ary[i]);
         }
         return this.ItemAry;
     }
-    obj.ItemAdd = function (text, tag) {
+    obj.ItemAdd = function (btn_obj, tag) {
         var item_obj = {};
         item_obj.Selected = 0;
         item_obj.Hovered = 0;
         item_obj.SubMenu = null;
         item_obj.Div = null;
-        item_obj.Text = text;
         if (tag)
             item_obj.Tag = tag;
         else
-            item_obj.Tag = text;
+            item_obj.Tag = this.ItemAry.length;
+        btn_obj.MsDnCb = CallbackSet(obj.MsDnCbFun, obj, item_obj);
+        item_obj.BtnObj = btn_obj;
+        item_obj.prototype = btn_obj.prototype;
+        //item_obj.prototype.WrapDiv=btn_obj.WrapDiv;
+        //item_obj.BtnObj = DwxUiBtnPlus.ObjInit();
         this.ItemAry.push(item_obj);
         return item_obj;
     }
@@ -46,21 +52,19 @@ DwxUiMenu.ObjInit = function () {
 		item_obj.SubMenuX = alignx;
 		item_obj.SubMenuY = aligny;
 		menu.MenuAlign = 1;
+		menu.WrapCssSet();
         //item_obj.Div.appendChild(menu.WrapDiv);
     }
 
     
-    obj.TextCssUpd = function (item_obj) {
-        //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
-        item_obj.Div.style.cssText = this.ItemCssGet(item_obj);
-    }
     obj.SubShow = function (item_obj, on_off) {
         if (!item_obj.SubMenu)
             return;
         //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
         item_obj.SubMenuOn = on_off;
         if (on_off) {
-			var offsets = item_obj.Div.getBoundingClientRect();
+            //var offsets = item_obj.BtnObj.WrapDiv.getBoundingClientRect();
+            var offsets = item_obj.WrapDiv.getBoundingClientRect();
 			var top = offsets.top;
 			var left = offsets.left;
 			switch(item_obj.SubMenuX){
@@ -82,7 +86,7 @@ DwxUiMenu.ObjInit = function () {
 					item_obj.SubMenu.WrapDiv.style.top = sprintf("%spx", offsets.top);;
 					break;
 				case 2:
-					item_obj.SubMenu.WrapDiv.style.top = sprintf("%spx", offsets.top+item_obj.Div.offsetHeight);
+					item_obj.SubMenu.WrapDiv.style.top = sprintf("%spx", offsets.top+item_obj.BtnObj.WrapDiv.offsetHeight);
                     break;
             }
             
@@ -105,7 +109,7 @@ DwxUiMenu.ObjInit = function () {
         this.TextCssUpd(item_obj);
     }
     obj.MsOnSet = function (item_obj) {
-
+        /*
         item_obj.Div.addEventListener("mouseenter",
         (function () {
             //var ver_idx = idx;
@@ -122,6 +126,7 @@ DwxUiMenu.ObjInit = function () {
             }
             return hnd;
         })(), false);
+        */
     }
     obj.SelectType = 0;
     obj.SelectedAry = [];
@@ -146,21 +151,22 @@ DwxUiMenu.ObjInit = function () {
         }
     }
     obj.MsDnCb = null;
-    obj.MsDnEvt = function (item_obj) {
-        if (this.MsDnCb) {
-            //var this_obj=this.MsDnCb.CbObj;
-            this.MsDnCb.CbFun(this.MsDnCb.CbObj, this.MsDnCb.CbTag, item_obj.Tag);
-        }
-        else{ 
-            this.SelectMsDn(item_obj);
+    obj.MsDnCbFun = function (cb_obj, item_obj,sec_obj) {
 
-            if (item_obj.SubMenuOn) 
-                this.SubShow(item_obj, 0);
-            else
-                this.SubShow(item_obj, 1);
+        if (cb_obj.MsDnCb) {
+            //var obj_obj=cb_obj.MsDnCb.CbObj;
+            var res = cb_obj.MsDnCb.CbFun(cb_obj.MsDnCb.CbObj, cb_obj.MsDnCb.CbTag, item_obj.Tag, sec_obj.Tag);
+            if (!res) return;
         }
+        cb_obj.SelectMsDn(item_obj);
+
+        if (item_obj.SubMenuOn) 
+            cb_obj.SubShow(item_obj, 0);
+        else
+            cb_obj.SubShow(item_obj, 1);
     }
     obj.MsDnSet = function (item_obj) {
+        /*
         item_obj.Div.addEventListener("mousedown",
         (function () {
             //var ver_idx = idx;
@@ -169,56 +175,58 @@ DwxUiMenu.ObjInit = function () {
             }
             return hnd;
         })(), false);
+        */
     }
     
-
-    obj.WrapCssGet = function () {
-        var ary = [];
+    obj.WrapCss = DwxUiCssAry();
+    obj.WrapCssSet = function () {
         //ary.push("list-style: none");
-        ary.push("box-sizing: border-box");
-        ary.push("display: block");
+        this.WrapCss.Set("box-sizing", "border-box");
+        this.WrapCss.Set("display", "block");
         if (this.MenuAlign) {
-            ary.push("position: fixed");
-            ary.push("top: -9999px");
-            ary.push("left: -9999px");
+            this.WrapCss.Set("position", "fixed");
+            this.WrapCss.Set("top", "-9999px");
+            this.WrapCss.Set("left", "-9999px");
         }
         else {
-			//ary.push("position: relative");
+			//this.WrapCss.Set("position", "relative");
             if (this.WidthEven) {
-                ary.push("width: 100%");
-                ary.push("display: table");
+                this.WrapCss.Set("width", "100%");
+                this.WrapCss.Set("display", "table");
             };
         }
-        ary.push("margin: 0px");
-        ary.push("border: 0px solid red");
-        //ary.push("border-radius: 6px 6px 6px 6px"); 
-        ary.push("padding: 0px");
-        //ary.push("overflow: hidden");
+        this.WrapCss.Set("margin", "0px");
+        this.WrapCss.Set("border", "0px solid red");
+        //this.WrapCss.Set("border-radius", "6px 6px 6px 6px"); 
+        this.WrapCss.Set("padding", "0px");
+        //this.WrapCss.Set("overflow", "hidden");
 
-        //ary.push(sprintf("background-color: %s",this.BkColorStr));
-        //ary.push(sprintf("height: %spx", h));
-        return ary.join(";");
+        //this.WrapCss.Set(sprintf("background-color", "%s",this.BkColorStr));
+        //this.WrapCss.Set(sprintf("height", "%spx", h));
     }
+    obj.WrapCssSet();
 
-    obj.ItemCssGet = function (item_obj) {
-        var ary = [];
+    obj.TextCssUpd = function (item_obj) {
 
-        ary.push("box-sizing: border-box");
-        //ary.push("position: relative");
+        var css = item_obj.BtnObj.WrapCss;
+        //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
+
+        css.Set("box-sizing", "border-box");
+        //css.Set("position", "relative");
         if (this.DirX) {
                      //if (this.WidthEven)
             if (this.WidthEven) {
-                ary.push("display: table-cell");
-                ary.push(sprintf("width: %s%", 100 / this.ItemAry.length));
+                css.Set("display", "table-cell");
+                css.Set("width", sprintf("%s%", 100 / this.ItemAry.length));
             }
             else
-				//ary.push("float: left");//inline will make height/width may like 13.223
-                ary.push("display: inline-block");//inline will make height/width may like 13.223
+                //css.Set("float", "left");//inline will make height/width may like 13.223
+                css.Set("display", "inline-block");//inline will make height/width may like 13.223
         }
-        ary.push(sprintf("margin: %s", this.ItemMarginStr));
-        ary.push(sprintf("padding: %s", this.ItemPaddingStr));
-        ary.push("vertical-align: middle");
-        ary.push("text-align: left");
+        css.Set("margin", sprintf("%s", this.ItemMarginStr));
+        css.Set("padding", sprintf("%s", this.ItemPaddingStr));
+        css.Set("vertical-align", "middle");
+        css.Set("text-align", "left");
 
         var fc = this.ItemColorStr;
         var bc = this.ItemBkColorStr;
@@ -229,34 +237,30 @@ DwxUiMenu.ObjInit = function () {
         var bdc = bc;
         if (item_obj.Hovered)
             bdc = fc;
-        ary.push(sprintf("border: %spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
-        ary.push(sprintf("color: %s", fc));
-        ary.push(sprintf("background-color: %s", bc));
+        css.Set("border", sprintf("%spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
+        css.Set("color", sprintf("%s", fc));
+        css.Set("background-color", sprintf("%s", bc));
 
-        return ary.join(";");
-        //if (this.WidthEven)
-        //    ary.push(sprintf("width: %s%", 100 / this.ItemAry.length));
-    };
-
+        //item_obj.BtnObj.WrapCss.Set("display", "block");
+        item_obj.BtnObj.WrapDiv.style.cssText = css.Make();
+    }
     obj.DivMake = function () {
         var div;
         div=document.createElement('div');
-        div.style.cssText = this.WrapCssGet();
+        div.style.cssText = this.WrapCss.Make();
         this.WrapDiv = div;
 
         for (var i = 0; i < this.ItemAry.length; i++) {
             var item_obj = this.ItemAry[i];
-            div = document.createElement('div');
-            this.WrapDiv.appendChild(div);
-            item_obj.Div = div;
-            div.style.cssText = this.ItemCssGet(item_obj);
-            div.innerHTML  = item_obj.Text;
+            item_obj.BtnObj.DivMake();
+            this.WrapDiv.appendChild(item_obj.BtnObj.WrapDiv);
+            this.TextCssUpd(item_obj);
             this.MsOnSet(item_obj);
             this.MsDnSet(item_obj);
             if (!item_obj.SubMenu)
                 continue;
             item_obj.SubMenu.DivMake();
-            item_obj.Div.appendChild( item_obj.SubMenu.WrapDiv);
+            item_obj.BtnObj.WrapDiv.appendChild( item_obj.SubMenu.WrapDiv);
         }
         return this.WrapDiv;
     }

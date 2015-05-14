@@ -26,8 +26,8 @@ DwxUiTree.ObjInit = function () {
             fc = this.BkColorStr;
             bc = this.ColorStr;
         }
-        this.WrapCss.Add("color", fc);
-        this.WrapCss.Add("background-color", bc);
+        //this.WrapCss.Add("color", fc);
+        //this.WrapCss.Add("background-color", bc);
 
         //var bdc = bc;
         //if (this.Hovered)
@@ -85,7 +85,7 @@ DwxUiTree.ObjInit = function () {
         var div = document.createElement('div');
         div.innerHTML = sprintf('<img src="%s"/>',sec_obj.Value);
         //sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
+        div.style.cssText = sec_obj.Css.Make();
 
         sec_obj.Div = div;
         //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
@@ -110,7 +110,7 @@ DwxUiTree.ObjInit = function () {
                 break;
         };
         sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
+        div.style.cssText = sec_obj.Css.Make();
         sec_obj.Div = div;
         //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
         return div;
@@ -134,7 +134,7 @@ DwxUiTree.ObjInit = function () {
                 break;
         };
         sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Get();
+        div.style.cssText = sec_obj.Css.Make();
         sec_obj.Div = div;
         //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
         return div;
@@ -144,7 +144,7 @@ DwxUiTree.ObjInit = function () {
         var div = document.createElement('div');
         div.innerHTML = sec_obj.Value;
         sec_obj.Css.Fix("text-align", "left");
-        div.style.cssText = sec_obj.Css.Get();;
+        div.style.cssText = sec_obj.Css.Make();;
         sec_obj.Div = div;
         //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
         return div;
@@ -229,7 +229,7 @@ DwxUiTree.ObjInit = function () {
     obj.DivMake = function () {
         var div;
         div=document.createElement('div');
-        div.style.cssText = this.WrapCss.Get();
+        div.style.cssText = this.WrapCss.Make();
         this.WrapDiv = div;
 
         for (var i = 0; i < this.SecAry.length; i++) {
