@@ -1,35 +1,33 @@
-DwxUiMenu = {};
 
-DwxUiMenu.ObjInit = function () {
-    var obj = {};
+DwxUiMenu = function () {
+    DwxUiDiv.call(this);
 
-    obj.FontSize = 16;
-    obj.ItemColorStr = "hsl(0,0%,100%)";
-    obj.ItemBkColorStr = "#428bca";//"hsl(0,0%,100%)";
-    obj.ItemMarginStr = "0px";
-    obj.ItemPaddingStr = "5px 10px";
-    obj.ItemBdNum = 1;
-    obj.ItemBdType = "solid";
+    this.FontSize = 16;
+    this.ItemColorStr = "hsl(0,0%,100%)";
+    this.ItemBkColorStr = "#428bca";//"hsl(0,0%,100%)";
+    this.ItemMarginStr = "0px";
+    this.ItemPaddingStr = "5px 10px";
+    this.ItemBdNum = 1;
+    this.ItemBdType = "solid";
 
-    obj.MenuAlign = 0;
-    obj.WidthEven = 0;
+    this.MenuAlign = 0;
+    this.WidthEven = 0;
 
-    obj.ColorStr = "hsl(0,0%,0%)";
-    obj.BkColorStr = "#428bca";//"hsl(0,0%,100%)";
+    this.ColorStr = "hsl(0,0%,0%)";
+    this.BkColorStr = "#428bca";//"hsl(0,0%,100%)";
 
-    obj.ItemAry = [];
-    obj.ItemAryAdd = function (ary) {
+    this.ItemAry = [];
+    this.ItemAryAdd = function (ary) {
 
         for (var i = 0; i < ary.length; i++) {
-            var btn_obj=new DwxUiBtnPlus();
-            btn_obj.SecAdd("Text", ary[i], ary[i]);
-            this.ItemAdd(btn_obj,ary[i]);
+
+
+            this.ItemAdd(ary[i],ary[i]);
         }
         return this.ItemAry;
     }
-    obj.ItemAdd = function (btn_obj, tag) {
+    this.ItemAdd = function (tag, text) {
         var item_obj = {};
-        item_obj.BtnObj = btn_obj;
         item_obj.Selected = 0;
         item_obj.Hovered = 0;
         item_obj.SubMenu = null;
@@ -38,15 +36,17 @@ DwxUiMenu.ObjInit = function () {
             item_obj.Tag = tag;
         else
             item_obj.Tag = this.ItemAry.length;
-        btn_obj.MsDnCb = CallbackSet(obj.MsDnCbFun, obj, item_obj);
-
-
+        var btn_obj = new DwxUiBtnPlus();
+        if (text) {
+            btn_obj.SecAdd("Text", text, text);
+        }
+        btn_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, item_obj);        item_obj.BtnObj = btn_obj;
         //item_obj.prototype.WrapDiv=btn_obj.WrapDiv;
         //item_obj.BtnObj = DwxUiBtnPlus.ObjInit();
         this.ItemAry.push(item_obj);
         return item_obj;
     }
-    obj.ItemSubSet = function (idx,menu,alignx,aligny) {
+    this.ItemSubSet = function (idx,menu,alignx,aligny) {
         var item_obj = this.ItemAry[idx];
         item_obj.SubMenu = menu;
         item_obj.SubMenuOn = 0;
@@ -58,7 +58,7 @@ DwxUiMenu.ObjInit = function () {
     }
 
     
-    obj.SubShow = function (item_obj, on_off) {
+    this.SubShow = function (item_obj, on_off) {
         if (!item_obj.SubMenu)
             return;
         //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
@@ -98,7 +98,7 @@ DwxUiMenu.ObjInit = function () {
         }
     }
 
-    obj.MsOnEvt = function (item_obj,dir) {
+    this.MsOnEvt = function (item_obj,dir) {
         if (dir) {
             item_obj.Hovered = 1;
             //obj.SubShow(item_obj, 1);//Menuitem_obj.SubMenu.WrapDiv.style.display = "block";
@@ -109,13 +109,13 @@ DwxUiMenu.ObjInit = function () {
         }
         this.TextCssUpd(item_obj);
     }
-    obj.MsOnSet = function (item_obj) {
+    this.MsOnSet = function (item_obj) {
         /*
         item_obj.Div.addEventListener("mouseenter",
         (function () {
             //var ver_idx = idx;
             var hnd = function () {
-                obj.MsOnEvt(item_obj,1);
+                this.MsOnEvt(item_obj,1);
             }
             return hnd;
         })(), false);
@@ -123,15 +123,15 @@ DwxUiMenu.ObjInit = function () {
         (function () {
             //var ver_idx = idx;
             var hnd = function () {
-                obj.MsOnEvt(item_obj, 0);
+                this.MsOnEvt(item_obj, 0);
             }
             return hnd;
         })(), false);
         */
     }
-    obj.SelectType = 0;
-    obj.SelectedAry = [];
-    obj.SelectMsDn = function (item_obj) {
+    this.SelectType = 0;
+    this.SelectedAry = [];
+    this.SelectMsDn = function (item_obj) {
         switch (this.SelectType) {
             case 0:
                 return;
@@ -151,8 +151,8 @@ DwxUiMenu.ObjInit = function () {
             case 2:
         }
     }
-    obj.MsDnCb = null;
-    obj.MsDnCbFun = function (cb_obj, item_obj,sec_obj) {
+    this.MsDnCb = null;
+    this.MsDnCbFun = function (cb_obj, item_obj,sec_obj) {
 
         if (cb_obj.MsDnCb) {
             //var obj_obj=cb_obj.MsDnCb.CbObj;
@@ -167,35 +167,34 @@ DwxUiMenu.ObjInit = function () {
             cb_obj.SubShow(item_obj, 1);
     }
   
-    obj.WrapCss = DwxUiCssAry();
-    obj.WrapCssSet = function () {
+    this.WrapCssSet = function () {
         //ary.push("list-style: none");
-        this.WrapCss.Set("box-sizing", "border-box");
-        this.WrapCss.Set("display", "block");
+        this.CssAttSet("box-sizing", "border-box");
+        this.CssAttSet("display", "block");
         if (this.MenuAlign) {
-            this.WrapCss.Set("position", "fixed");
-            this.WrapCss.Set("top", "-9999px");
-            this.WrapCss.Set("left", "-9999px");
+            this.CssAttSet("position", "fixed");
+            this.CssAttSet("top", "-9999px");
+            this.CssAttSet("left", "-9999px");
         }
         else {
-			//this.WrapCss.Set("position", "relative");
+			//this.CssAttSet("position", "relative");
             if (this.WidthEven) {
-                this.WrapCss.Set("width", "100%");
-                this.WrapCss.Set("display", "table");
+                this.CssAttSet("width", "100%");
+                this.CssAttSet("display", "table");
             };
         }
-        this.WrapCss.Set("margin", "0px");
-        this.WrapCss.Set("border", "0px solid red");
-        //this.WrapCss.Set("border-radius", "6px 6px 6px 6px"); 
-        this.WrapCss.Set("padding", "0px");
-        //this.WrapCss.Set("overflow", "hidden");
+        this.CssAttSet("margin", "0px");
+        this.CssAttSet("border", "0px solid red");
+        //this.CssAttSet("border-radius", "6px 6px 6px 6px"); 
+        this.CssAttSet("padding", "0px");
+        //this.CssAttSet("overflow", "hidden");
 
-        //this.WrapCss.Set(sprintf("background-color", "%s",this.BkColorStr));
-        //this.WrapCss.Set(sprintf("height", "%spx", h));
+        //this.CssAttSet(sprintf("background-color", "%s",this.BkColorStr));
+        //this.CssAttSet(sprintf("height", "%spx", h));
     }
-    obj.WrapCssSet();
+    this.WrapCssSet();
 
-    obj.TextCssUpd = function (item_obj) {
+    this.TextCssUpd = function (item_obj) {
 
         var btn = item_obj.BtnObj;
         //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
@@ -230,13 +229,13 @@ DwxUiMenu.ObjInit = function () {
         btn.CssAttSet("color", sprintf("%s", fc));
         btn.CssAttSet("background-color", sprintf("%s", bc));
 
-        //item_obj.BtnObj.WrapCss.Set("display", "block");
+        //item_obj.BtnObj.CssAttSet("display", "block");
         btn.WrapDiv.style.cssText = btn.CssStrGet();
     }
-    obj.DivMake = function () {
+    this.DivMake = function () {
         var div;
         div=document.createElement('div');
-        div.style.cssText = this.WrapCss.Make();
+        div.style.cssText = this.CssStrGet();
         this.WrapDiv = div;
 
         for (var i = 0; i < this.ItemAry.length; i++) {
@@ -252,32 +251,29 @@ DwxUiMenu.ObjInit = function () {
         }
         return this.WrapDiv;
     }
-
-
-    return obj;
 }
 DwxUiMenu.DemoLoad = function () {
     var div = document.createElement('div');
     div.innerHTML = "adsfasdfasdfaf";
     document.body.appendChild(div);
 
-    var menu = DwxUiMenu.ObjInit();
+    var menu = new DwxUiMenu();
     menu.SelectType = 1;
     menu.DirX = 1;
     menu.ItemAryAdd(["1fads", "1sfdgsd", "1sdfgsdfgsd"]);
 
 
-    var sub1 = DwxUiMenu.ObjInit();
+    var sub1 = new DwxUiMenu();
     sub1.DirX = 0;
     sub1.ItemAryAdd(["1-1fads","1-2sfdgsd","1-3sdfgsdfgsd","1-4sdfgsdfgsd"]);
     //sub1.DivMake();
     menu.ItemSubSet(0, sub1, 1, 2);
 
-    var sub2 = DwxUiMenu.ObjInit();
+    var sub2 = new DwxUiMenu();
     sub2.DirX = 0;
     sub2.ItemAryAdd(["2-1fads","2-2sfdgsd","2-3sdfgsdfgsd"]);
     sub2.DivMake();
-    var sub3 = DwxUiMenu.ObjInit();
+    var sub3 = new DwxUiMenu();
     sub3.DirX = 0;
     sub3.ItemAryAdd(["2-1fads", "2-2sfdgsd", "2-3sdfgsdfgsd"]);
     sub3.DivMake();
