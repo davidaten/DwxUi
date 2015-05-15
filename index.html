@@ -9,6 +9,40 @@
             border: 2px solid purple;
         }
     </style>
+    <script>
+        // I am the base girl object.
+        var girl = function (name){
+
+                // Store the name.
+                this.name = name;
+
+                this.traits = {};
+
+        };
+
+
+        // -------------------------------------------------- //
+        // -------------------------------------------------- //
+        // -------------------------------------------------- //
+        // -------------------------------------------------- //
+
+
+        // Create a girl instance.
+        //
+        // NOTE: Be sure to call INIT() on the object, otherwise
+        // it will not be property initialized.
+        var girl0 = new girl("0");
+        var t01 = Object.create(girl0);
+        var t02 = Object.create(girl0);
+        t01.name = "01";
+        t01.traits.name = "01";
+        t02.name = "02";
+        t02.traits.name = "02";
+        var girl1 = new girl("0");
+        var t11 = Object.create(girl1);
+        var t12 = Object.create(girl1);
+
+    </script>
     <script type="text/javascript" src="BaseFun.js"></script>
     <script type="text/javascript" src="DwxUiBase.js"></script>
     <script type="text/javascript" src="DwxUiBtnPlus.js"></script>

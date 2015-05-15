@@ -1,33 +1,31 @@
-DwxUiBtnPlus = {};
 
-DwxUiBtnPlus.ObjInit = function () {
-    var obj = {};
+DwxUiBtnPlus = function () {
+    //DwxUiBtnPlus.prototype = new DwxUiDiv();
+    //obj= new DwxUiDiv();
+    DwxUiDiv.call(this);
     //SecWidth for char Icon, SecWidth&SecHeight for image
-    obj.SecWidth = 16;
-    obj.SecHeight = 20;
+    this.SecWidth = 16;
+    this.SecHeight = 20;
 
-    obj.prototype = {};
-    obj.prototype.WrapDiv = null;
-    obj.WrapCss = DwxUiCssAry();
-    obj.WrapCssSet = function () {
-        this.WrapCss.Set("box-sizing", "border-box");
-        this.WrapCss.Set("display", "inline-block");
-        this.WrapCss.Set("vertical-align", "middle");
+    this.WrapCssSet = function () {
+        this.CssAttSet("box-sizing", "border-box");
+        this.CssAttSet("display", "inline-block");
+        this.CssAttSet("vertical-align", "middle");
     };
-    obj.WrapCssSet();
+    this.WrapCssSet();
 
-    obj.SecAry = [];
-    obj.SecCssSet = function (sec_obj) {
-        sec_obj.Css.Set("display", "inline-block");
-        sec_obj.Css.Set("box-sizing", "content-box");
-        sec_obj.Css.Set("margin", "0px");
-        sec_obj.Css.Set("border", "0px solid black");
-        sec_obj.Css.Set("padding", "0px");
-        sec_obj.Css.Set("vertical-align", "middle");
-        sec_obj.Css.Set("text-align", "center");
+    this.SecAry = [];
+    this.SecCssSet = function (sec_obj) {
+        sec_obj.CssAttSet("display", "inline-block");
+        sec_obj.CssAttSet("box-sizing", "content-box");
+        sec_obj.CssAttSet("margin", "0px");
+        sec_obj.CssAttSet("border", "0px solid black");
+        sec_obj.CssAttSet("padding", "0px");
+        sec_obj.CssAttSet("vertical-align", "middle");
+        sec_obj.CssAttSet("text-align", "center");
     };
-    obj.SecAdd = function (type, value, tag) {
-        var sec_obj = {};
+    this.SecAdd = function (type, value, tag) {
+        var sec_obj = new DwxUiDiv();
         sec_obj.Type = type;
         sec_obj.Value = value;
         if (tag)
@@ -35,25 +33,24 @@ DwxUiBtnPlus.ObjInit = function () {
         else
             sec_obj.Tag = this.SecAry.length;
         sec_obj.Hovered = 0;
-        sec_obj.Css = DwxUiCssAry();
+
         this.SecCssSet(sec_obj);
-        sec_obj.Div = null;
         this.SecAry.push(sec_obj);
         return sec_obj;
     }
 
-    obj.DivImgMake = function (sec_obj) {
+    this.DivImgMake = function (sec_obj) {
         var div = document.createElement('div');
-        sec_obj.Div = div;
+        sec_obj.WrapDiv = div;
         div.innerHTML = sprintf('<img src="%s"/>', sec_obj.Value);
-        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
-        sec_obj.Css.Set("height", sprintf("%spx", Int2Str(this.SecHeight)));
-        div.style.cssText = sec_obj.Css.Make();
+        sec_obj.CssAttSet("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        sec_obj.CssAttSet("height", sprintf("%spx", Int2Str(this.SecHeight)));
+        div.style.cssText = sec_obj.CssStrGet();
         return div;
     }
-    obj.DivSubMake = function (sec_obj) {
+    this.DivSubMake = function (sec_obj) {
         var div = document.createElement('div');
-        sec_obj.Div = div;
+        sec_obj.WrapDiv = div;
         switch (sec_obj.Value) {
             case 0:
                 div.innerHTML = "\u00A0";//empty
@@ -68,13 +65,13 @@ DwxUiBtnPlus.ObjInit = function () {
                 //ary.push("color: hsl(4, 100%, 45%)");
                 break;
         };
-        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
-        div.style.cssText = sec_obj.Css.Make();
+        sec_obj.CssAttSet("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        div.style.cssText = sec_obj.CssStrGet();
         return div;
     }
-    obj.DivCheckMake = function (sec_obj) {
+    this.DivCheckMake = function (sec_obj) {
         var div = document.createElement('div');
-        sec_obj.Div = div;
+        sec_obj.WrapDiv = div;
         switch (sec_obj.Value) {
             case 0:
                 div.innerHTML = "\u2610";//box=2610
@@ -89,20 +86,20 @@ DwxUiBtnPlus.ObjInit = function () {
                 //ary.push("color: hsl(4, 100%, 45%)");
                 break;
         };
-        sec_obj.Css.Set("width", sprintf("%spx", Int2Str(this.SecWidth)));
-        div.style.cssText = sec_obj.Css.Make();
+        sec_obj.CssAttSet("width", sprintf("%spx", Int2Str(this.SecWidth)));
+        div.style.cssText = sec_obj.CssStrGet();
         return div;
     }
-    obj.DivTextMake = function (sec_obj) {
+    this.DivTextMake = function (sec_obj) {
         var div = document.createElement('div');
-        sec_obj.Div = div;
+        sec_obj.WrapDiv = div;
         div.innerHTML = sec_obj.Value;
-        sec_obj.Css.Set("text-align", "left");
-        div.style.cssText = sec_obj.Css.Make();;
+        sec_obj.CssAttSet("text-align", "left");
+        div.style.cssText = sec_obj.CssStrGet();;
         return div;
     }
 
-    obj.MsOnEvt = function (sec_obj,dir) {
+    this.MsOnEvt = function (sec_obj,dir) {
         if (dir) {
             sec_obj.Hovered = 1;
             //obj.SubShow(sec_obj, 1);//Menuitem_obj.SubMenu.WrapDiv.style.display = "block";
@@ -113,27 +110,27 @@ DwxUiBtnPlus.ObjInit = function () {
         }
         //this.TextCssUpd(sec_obj);
     }
-    obj.MsOnSet = function (sec_obj) {
+    this.MsOnSet = function (evt_obj, sec_obj) {
 
-        sec_obj.Div.addEventListener("mouseenter",
+        sec_obj.WrapDiv.addEventListener("mouseenter",
         (function () {
             //var ver_idx = idx;
             var hnd = function () {
-                obj.MsOnEvt(sec_obj,1);
+                evt_obj.MsOnEvt(sec_obj,1);
             }
             return hnd;
         })(), false);
-        sec_obj.Div.addEventListener("mouseleave",
+        sec_obj.WrapDiv.addEventListener("mouseleave",
         (function () {
             //var ver_idx = idx;
             var hnd = function () {
-                obj.MsOnEvt(sec_obj, 0);
+                evt_obj.MsOnEvt(sec_obj, 0);
             }
             return hnd;
         })(), false);
     }
-    obj.MsDnCb = null;
-    obj.MsDnEvt = function (sec_obj) {
+    this.MsDnCb = null;
+    this.MsDnEvt = function (sec_obj) {
         if (this.MsDnCb) {
             //var this_obj=this.MsDnCb.CbObj;
             this.MsDnCb.CbFun(this.MsDnCb.CbObj, this.MsDnCb.CbTag, sec_obj);
@@ -143,18 +140,18 @@ DwxUiBtnPlus.ObjInit = function () {
            
         }
     }
-    obj.MsDnSet = function (sec_obj) {
-        sec_obj.Div.addEventListener("mousedown",
+    this.MsDnSet = function (evt_obj, sec_obj) {
+        sec_obj.WrapDiv.addEventListener("mousedown",
         (function () {
             //var ver_idx = idx;
             var hnd = function () {
-                obj.MsDnEvt(sec_obj);
+                evt_obj.MsDnEvt(sec_obj);
             }
             return hnd;
         })(), false);
     }
     
-    obj.DivSecMake = function (sec_obj) {
+    this.DivSecMake = function (sec_obj) {
         if (sec_obj.Hidden)
             return;
         switch (sec_obj.Type) {
@@ -171,13 +168,13 @@ DwxUiBtnPlus.ObjInit = function () {
                 this.DivTextMake(sec_obj);
                 break;
         }
-        this.MsOnSet(sec_obj);
-        this.MsDnSet(sec_obj);
-        this.WrapDiv.appendChild(sec_obj.Div);
+        this.MsOnSet(this, sec_obj);
+        this.MsDnSet(this, sec_obj);
+        this.WrapDiv.appendChild(sec_obj.WrapDiv);
     }
     
 
-    obj.DivMake = function () {
+    this.DivMake = function () {
         var div;
         div = document.createElement('div');
         this.WrapDiv = div;
@@ -187,21 +184,19 @@ DwxUiBtnPlus.ObjInit = function () {
             this.DivSecMake(sec_obj);
         }
 
-        div.style.cssText = this.WrapCss.Make();
+        div.style.cssText = this.CssStrGet();
 
         return this.WrapDiv;
     }
-
-    //obj.WrapCssInit();
-    return obj;
 }
+//DwxUiBtnPlus.prototype = new DwxUiDiv();
 DwxUiBtnPlus.DemoLoad = function () {
     var div = document.createElement('div');
     div.innerHTML = "adsfasdfasdfaf";
     document.body.appendChild(div);
 
-    var test = DwxUiBtnPlus.ObjInit();
-    test.WrapCss.Set("display", "block");
+    var test = new DwxUiBtnPlus();
+    test.CssAttSet("display", "block");
     test.SecWidth = 16;
     //test.WrapCss.Add("font-size", sprintf("%spx",Int2Str(test.SecWidth)));
     //test.WrapCss.Add("line-height", sprintf("%spx",Int2Str(this.LineHeight)));
@@ -211,10 +206,10 @@ DwxUiBtnPlus.DemoLoad = function () {
     test.SecAdd("Text", "Level 0", 2);
     test.DivMake();
     document.body.appendChild(test.WrapDiv);
-    var test = DwxUiBtnPlus.ObjInit();
-    test.WrapCss.Set("display", "block");
+    var test = new DwxUiBtnPlus();
+    test.CssAttSet("display", "block");
     test.SecAdd("Sub", 0, 0);
-    test.SecAry[0].Css.Set("margin", sprintf("0 %spx 0 0", Int2Str(test.SecWidth * 2)));
+    test.SecAry[0].CssAttSet("margin", sprintf("0 %spx 0 0", Int2Str(test.SecWidth * 2)));
     test.SecAdd("Check", 1, 1);
     test.SecAdd("Text", "Level 1", 2);
     test.DivMake();

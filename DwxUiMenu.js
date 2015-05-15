@@ -21,7 +21,7 @@ DwxUiMenu.ObjInit = function () {
     obj.ItemAryAdd = function (ary) {
 
         for (var i = 0; i < ary.length; i++) {
-            var btn_obj=DwxUiBtnPlus.ObjInit();
+            var btn_obj=new DwxUiBtnPlus();
             btn_obj.SecAdd("Text", ary[i], ary[i]);
             this.ItemAdd(btn_obj,ary[i]);
         }
@@ -29,6 +29,7 @@ DwxUiMenu.ObjInit = function () {
     }
     obj.ItemAdd = function (btn_obj, tag) {
         var item_obj = {};
+        item_obj.BtnObj = btn_obj;
         item_obj.Selected = 0;
         item_obj.Hovered = 0;
         item_obj.SubMenu = null;
@@ -38,8 +39,8 @@ DwxUiMenu.ObjInit = function () {
         else
             item_obj.Tag = this.ItemAry.length;
         btn_obj.MsDnCb = CallbackSet(obj.MsDnCbFun, obj, item_obj);
-        item_obj.BtnObj = btn_obj;
-        item_obj.prototype = btn_obj.prototype;
+
+
         //item_obj.prototype.WrapDiv=btn_obj.WrapDiv;
         //item_obj.BtnObj = DwxUiBtnPlus.ObjInit();
         this.ItemAry.push(item_obj);
@@ -64,7 +65,7 @@ DwxUiMenu.ObjInit = function () {
         item_obj.SubMenuOn = on_off;
         if (on_off) {
             //var offsets = item_obj.BtnObj.WrapDiv.getBoundingClientRect();
-            var offsets = item_obj.WrapDiv.getBoundingClientRect();
+            var offsets = item_obj.BtnObj.WrapDiv.getBoundingClientRect();
 			var top = offsets.top;
 			var left = offsets.left;
 			switch(item_obj.SubMenuX){
@@ -165,19 +166,7 @@ DwxUiMenu.ObjInit = function () {
         else
             cb_obj.SubShow(item_obj, 1);
     }
-    obj.MsDnSet = function (item_obj) {
-        /*
-        item_obj.Div.addEventListener("mousedown",
-        (function () {
-            //var ver_idx = idx;
-            var hnd = function () {
-                obj.MsDnEvt(item_obj);
-            }
-            return hnd;
-        })(), false);
-        */
-    }
-    
+  
     obj.WrapCss = DwxUiCssAry();
     obj.WrapCssSet = function () {
         //ary.push("list-style: none");
@@ -208,25 +197,25 @@ DwxUiMenu.ObjInit = function () {
 
     obj.TextCssUpd = function (item_obj) {
 
-        var css = item_obj.BtnObj.WrapCss;
+        var btn = item_obj.BtnObj;
         //item_obj.Div.children[0].style.cssText = this.TextCssGet(item_obj);
 
-        css.Set("box-sizing", "border-box");
-        //css.Set("position", "relative");
+        btn.CssAttSet("box-sizing", "border-box");
+        //btn.CssAttSet("position", "relative");
         if (this.DirX) {
                      //if (this.WidthEven)
             if (this.WidthEven) {
-                css.Set("display", "table-cell");
-                css.Set("width", sprintf("%s%", 100 / this.ItemAry.length));
+                btn.CssAttSet("display", "table-cell");
+                btn.CssAttSet("width", sprintf("%s%", 100 / this.ItemAry.length));
             }
             else
-                //css.Set("float", "left");//inline will make height/width may like 13.223
-                css.Set("display", "inline-block");//inline will make height/width may like 13.223
+                //btn.CssAttSet("float", "left");//inline will make height/width may like 13.223
+                btn.CssAttSet("display", "inline-block");//inline will make height/width may like 13.223
         }
-        css.Set("margin", sprintf("%s", this.ItemMarginStr));
-        css.Set("padding", sprintf("%s", this.ItemPaddingStr));
-        css.Set("vertical-align", "middle");
-        css.Set("text-align", "left");
+        btn.CssAttSet("margin", sprintf("%s", this.ItemMarginStr));
+        btn.CssAttSet("padding", sprintf("%s", this.ItemPaddingStr));
+        btn.CssAttSet("vertical-align", "middle");
+        btn.CssAttSet("text-align", "left");
 
         var fc = this.ItemColorStr;
         var bc = this.ItemBkColorStr;
@@ -237,12 +226,12 @@ DwxUiMenu.ObjInit = function () {
         var bdc = bc;
         if (item_obj.Hovered)
             bdc = fc;
-        css.Set("border", sprintf("%spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
-        css.Set("color", sprintf("%s", fc));
-        css.Set("background-color", sprintf("%s", bc));
+        btn.CssAttSet("border", sprintf("%spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
+        btn.CssAttSet("color", sprintf("%s", fc));
+        btn.CssAttSet("background-color", sprintf("%s", bc));
 
         //item_obj.BtnObj.WrapCss.Set("display", "block");
-        item_obj.BtnObj.WrapDiv.style.cssText = css.Make();
+        btn.WrapDiv.style.cssText = btn.CssStrGet();
     }
     obj.DivMake = function () {
         var div;
@@ -256,7 +245,6 @@ DwxUiMenu.ObjInit = function () {
             this.WrapDiv.appendChild(item_obj.BtnObj.WrapDiv);
             this.TextCssUpd(item_obj);
             this.MsOnSet(item_obj);
-            this.MsDnSet(item_obj);
             if (!item_obj.SubMenu)
                 continue;
             item_obj.SubMenu.DivMake();
