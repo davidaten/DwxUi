@@ -1,7 +1,5 @@
-DwxUiTree= {};
-
-DwxUiTree.ObjInit = function () {
-    var obj = {};
+DwxUiTree = function () {
+    DwxUiDiv.call(this);
 
     obj.FontSize = 16;
     obj.LineHeight = 20;
@@ -35,35 +33,30 @@ DwxUiTree.ObjInit = function () {
         //ary.push(sprintf("border: %spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
     };
 
-    obj.SecAry = [];
-    obj.SecAdd = function (type,value,tag) {
-        var sec_obj = {};
-        sec_obj.Type = type;
-        sec_obj.Value = value;
-        /*
-        switch (type) {
-            case "Check":
-                sec_obj.Color = "hsl(127, 100%, 40%)";
-                sec_obj.State = 0;
-                break;
-            case "Expand":
-                sec_obj.Color = "hsl(4, 100%, 45%)";
-                sec_obj.State = 0;
-                break;
-            case "Text":
-                break;
-            default:
-        };
-        */
-        if (tag)
-            sec_obj.Tag = tag;
+    obj.NodeAry = [];
+    obj.NodeAdd = function (up_obj, pos, tag, text) {
+        var node_ary;
+        if (!up_obj)
+            node_ary=this.NodeAry;
         else
-            sec_obj.Tag = this.SecAry.length;
-        sec_obj.Hovered = 0;
-        this.SecCssInit(sec_obj);
-        sec_obj.Div = null;
-        this.SecAry.push(sec_obj);
-        return sec_obj;
+            node_ary=up_obj.NodeAry;
+        if (pos < 0)
+            pos = node_ary.length;
+
+        var node_obj = new DwxBtnPlus();
+        node_ary.splice(pos, 0, node_obj);
+        if (tag)
+            node_obj.Tag = tag;
+        else
+            node_obj.Tag = node_ary.length;
+        if (text)
+            node_obj.Text = text;
+        else 
+            node_obj.Text = null;
+        node_o
+        node_obj.NodeAry = [];
+        node_obj.SubOn = 0;
+        node_obj.ChkOn = 0;
     }
 
     obj.SecCssInit = function (sec_obj) {
