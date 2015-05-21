@@ -136,14 +136,3 @@ function ElementWalk(node, cb_obj) {
     }
 }
 
-function removeAllChildren(theParent) {
-
-    // Create the Range object
-    var rangeObj = new Range();
-
-    // Select all of theParent's children
-    rangeObj.selectNodeContents(theParent);
-
-    // Delete everything that is selected
-    rangeObj.deleteContents();
-}

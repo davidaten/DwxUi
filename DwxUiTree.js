@@ -1,50 +1,47 @@
 DwxUiTree = function () {
     DwxUiDiv.call(this);
+    this.FontSize = 16;
+    this.LineHeight = 20;
+    this.ColorStr = "hsl(0,0%,100%)";
+    this.BkColorStr = "#428bca";//"hsl(0,0%,100%)";
+    this.WrapCssSet = function () {
+        //ary.push("list-style: none");
+        this.CssAttSet("box-sizing", "border-box");
+        this.CssAttSet("display", "block");
+        this.CssAttSet("margin", "0px");
+        this.CssAttSet("border", "0px solid red");
+        //this.CssAttSet("border-radius", "6px 6px 6px 6px"); 
+        this.CssAttSet("padding", "0px");
+        this.CssAttSet("font-size", sprintf("%spx", Int2Str(this.FontSize)));
+        this.CssAttSet("line-height", sprintf("%spx", Int2Str(this.LineHeight)));
+        this.CssAttSet("color", sprintf("%s", this.ColorStr));
+        this.CssAttSet("background-color", sprintf("%s", this.BkColorStr));
+    }
+    this.WrapCssSet();
 
-    obj.FontSize = 16;
-    obj.LineHeight = 20;
-    obj.ColorStr = "hsl(0,0%,100%)";
-    obj.BkColorStr = "#428bca";//"hsl(0,0%,100%)";
-    obj.ItemMarginStr = "0px";
-    obj.ItemPaddingStr = "5px 10px";
-    obj.ItemBdNum = 1;
-    obj.ItemBdType = "solid";
 
-    obj.WrapCssInit = function () {
-        this.WrapCss = DwxUiCssAry();
-        this.WrapCss.Add("box-sizing", "border-box");
-        this.WrapCss.Add("display", "inline-block");
-        this.WrapCss.Add("vertical-align", "middle");
-        this.WrapCss.Add("font-size", sprintf("%spx",Int2Str(this.FontSize)));
-        this.WrapCss.Add("line-height", sprintf("%spx",Int2Str(this.LineHeight)));
+    this.ChkOnDef = 1;
+    this.ChkStatDef = 0;
+    this.SubOnDef = 1;
+    this.SubStatDef = 1;
 
-        var fc = this.ColorStr;
-        var bc = this.BkColorStr;
-        if (this.Selected) {
-            fc = this.BkColorStr;
-            bc = this.ColorStr;
+
+    this.NodeAry = [];
+    this.NodeAdd = function (up_obj, pos, tag, text) {
+        var up_ary,up_cnt;
+        if (!up_obj){
+            up_cnt=0;
+            up_ary=this.NodeAry;
         }
-        //this.WrapCss.Add("color", fc);
-        //this.WrapCss.Add("background-color", bc);
-
-        //var bdc = bc;
-        //if (this.Hovered)
-        //    bdc = fc;
-        //ary.push(sprintf("border: %spx %s %s", this.ItemBdNum, this.ItemBdType, bdc));
-    };
-
-    obj.NodeAry = [];
-    obj.NodeAdd = function (up_obj, pos, tag, text) {
-        var node_ary;
-        if (!up_obj)
-            node_ary=this.NodeAry;
-        else
-            node_ary=up_obj.NodeAry;
+        else{
+            up_cnt=up_obj.UpCnt+1;
+            up_ary=up_obj.NodeAry;
+        }
+        node_obj = new DwxUiBtnPlus();
+        node_obj.UpCnt = up_cnt;
         if (pos < 0)
-            pos = node_ary.length;
-
-        var node_obj = new DwxBtnPlus();
-        node_ary.splice(pos, 0, node_obj);
+            pos = up_ary.length;
+        up_ary.splice(pos, 0, node_obj);
         if (tag)
             node_obj.Tag = tag;
         else
@@ -53,212 +50,132 @@ DwxUiTree = function () {
             node_obj.Text = text;
         else 
             node_obj.Text = null;
-        node_o
         node_obj.NodeAry = [];
-        node_obj.SubOn = 0;
-        node_obj.ChkOn = 0;
+        node_obj.SubOn = this.SubOnDef;
+        node_obj.SubStat = this.SubStatDef;
+        node_obj.ChkOn = this.ChkOnDef;
+        node_obj.ChkStat = this.ChkStatDef; 
+
+        node_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, node_obj);
     }
 
-    obj.SecCssInit = function (sec_obj) {
-        sec_obj.Css = DwxUiCssAry();
+    this.PreMake = function () {
 
-        sec_obj.Css.Add("display", "inline-block");
-        sec_obj.Css.Add("box-sizing", "content-box");
-        //sec_obj.Css.Add(sprintf("width", "%dpx",sec_obj.FontSize));
-        sec_obj.Css.Add("margin", "0px");
-        sec_obj.Css.Add("border", "0px solid black");
-        //sec_obj.Css.Add("border-radius", "6px 6px 6px 6px"); 
-        sec_obj.Css.Add("padding", "0px");
-        sec_obj.Css.Add("vertical-align", "middle");
-        sec_obj.Css.Add("text-align", "center");
-
-    };
-
-    obj.DivImgMake = function (sec_obj) {
-        var div = document.createElement('div');
-        div.innerHTML = sprintf('<img src="%s"/>',sec_obj.Value);
-        //sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Make();
-
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
-        return div;
+        for (var i = 0; i < this.NodeAry.length; i++) {
+            this.NodePreMake(this.NodeAry[i]);
+        }
     }
 
+    this.NodePreMake = function (node_obj) {
 
-    obj.DivSubMake = function (sec_obj) {
-        var div = document.createElement('div');
-        switch (sec_obj.Value) {
-            case 0:
-                div.innerHTML = "\u00A0";//empty
-                //ary.push("color: hsl(0, 0%, 0%)");
+        node_obj.CssAttSet("display", "block");
+        node_obj.SecWidth = 16;
+        node_obj.SecAry = [];
+        //node_obj.NodeAry.length = 0;
+        if (node_obj.SubOn){
+            for (var i = 0; i < node_obj.UpCnt;i++)
+                node_obj.SecAdd("Sub", 0, "sub0");
+            node_obj.SubPos = node_obj.SecAry.length;
+            if (node_obj.NodeAry.length > 0) {
+                if (node_obj.SubStat)
+                    node_obj.SecAdd("Sub", 2, "sub");
+                else
+                    node_obj.SecAdd("Sub", 1, "sub");
+            }
+            else
+                node_obj.SecAdd("Sub", 0, "sub0");
+        }
+        if (node_obj.ChkOn) {
+            node_obj.ChkPos = node_obj.SecAry.length;
+            if (node_obj.ChkStat)
+                node_obj.SecAdd("Check", 0, "chk");
+            else
+                node_obj.SecAdd("Check", 1, "chk");
+        }
+        node_obj.SecAdd("Text", node_obj.Text, "txt");
+
+        for (var i = 0; i < node_obj.NodeAry.length; i++) {
+            this.NodePreMake(node_obj.NodeAry[i]);
+        }
+    }
+   
+    this.MsDnCb = null;
+    this.MsDnCbFun = function (cb_obj, node_obj, sec_obj) {
+        if (cb_obj.MsDnCb) {
+            //var obj_obj=cb_obj.MsDnCb.CbObj;
+            var res = cb_obj.MsDnCb.CbFun(cb_obj.MsDnCb.CbObj, cb_obj.MsDnCb.CbTag, item_obj.Tag, sec_obj.Tag);
+            if (!res) return;
+        }
+     
+        var upd=0;
+        switch (sec_obj.Tag) {
+            case "sub":
+                if (node_obj.NodeAry.length == 0)
+                    break;
+                if (node_obj.SubStat)
+                    node_obj.SubStat = 0;
+                else
+                    node_obj.SubStat = 1;
+                upd = 1;
                 break;
-            case 1:
-                div.innerHTML = "\u25BC";//down10004
-                //ary.push("color: hsl(127, 100%, 40%)");
+            case "chk":
+                if (node_obj.ChkStat)
+                    node_obj.ChkStat = 0;
+                else
+                    node_obj.ChkStat = 1;
+                upd = 1;
                 break;
-            case 2:
-                div.innerHTML = "\u25B2";//10008
-                //ary.push("color: hsl(4, 100%, 45%)");
+            case "txt":
                 break;
         };
-        sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Make();
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
-        return div;
-    }
-
-    obj.DivCheckMake = function (sec_obj) {
-        
-        var div = document.createElement('div');
-        switch (sec_obj.Value) {
-            case 0:
-                div.innerHTML = "\u2610";//box=2610
-                //ary.push("color: hsl(0, 0%, 0%)");
-                break;
-            case 1:
-                div.innerHTML = "\u2611";//boxOk=2611 //10004
-                //ary.push("color: hsl(127, 100%, 40%)");
-                break;
-            case 2:
-                div.innerHTML = "\u2612";//boxNg=2612 //10008
-                //ary.push("color: hsl(4, 100%, 45%)");
-                break;
-        };
-        sec_obj.Css.Add("width", sprintf("%spx", Int2Str(this.FontSize)));
-        div.style.cssText = sec_obj.Css.Make();
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
-        return div;
-    }
-    obj.DivTextMake = function (sec_obj) {
-
-        var div = document.createElement('div');
-        div.innerHTML = sec_obj.Value;
-        sec_obj.Css.Fix("text-align", "left");
-        div.style.cssText = sec_obj.Css.Make();;
-        sec_obj.Div = div;
-        //sec_obj.Div.children[0].style.cssText = this.TextCssGet(sec_obj);
-        return div;
-    }
-
-    obj.MsOnEvt = function (sec_obj,dir) {
-        if (dir) {
-            sec_obj.Hovered = 1;
-            //obj.SubShow(sec_obj, 1);//Menuitem_obj.SubMenu.WrapDiv.style.display = "block";
-        }
-        else {
-            sec_obj.Hovered = 0;
-            //this.SubShow(sec_obj, 0);
-        }
-        //this.TextCssUpd(sec_obj);
-    }
-    obj.MsOnSet = function (sec_obj) {
-
-        sec_obj.Div.addEventListener("mouseenter",
-        (function () {
-            //var ver_idx = idx;
-            var hnd = function () {
-                obj.MsOnEvt(sec_obj,1);
-            }
-            return hnd;
-        })(), false);
-        sec_obj.Div.addEventListener("mouseleave",
-        (function () {
-            //var ver_idx = idx;
-            var hnd = function () {
-                obj.MsOnEvt(sec_obj, 0);
-            }
-            return hnd;
-        })(), false);
-    }
-    obj.MsDnCb = null;
-    obj.MsDnEvt = function (sec_obj) {
-        if (this.MsDnCb) {
-            //var this_obj=this.MsDnCb.CbObj;
-            this.MsDnCb.CbFun(this.MsDnCb.CbObj, this.MsDnCb.CbTag, sec_obj.Tag);
-        }
-        else {
-
-           
-        }
-    }
-    obj.MsDnSet = function (sec_obj) {
-        sec_obj.Div.addEventListener("mousedown",
-        (function () {
-            //var ver_idx = idx;
-            var hnd = function () {
-                obj.MsDnEvt(sec_obj);
-            }
-            return hnd;
-        })(), false);
-    }
-    
-    obj.DivSecMake = function (sec_obj) {
-        if (sec_obj.Hidden)
+        if (upd == 0)
             return;
-        switch (sec_obj.Type) {
-            case "Img":
-                this.DivImgMake(sec_obj);
-                break;
+        var old = cb_obj.WrapDiv;
+        cb_obj.PreMake();
+        cb_obj.DivMake();
+        old.parentElement.replaceChild(cb_obj.WrapDiv, old);
+    }
 
-            case "Check":
-                this.DivCheckMake(sec_obj);
-                break;
-            case "Sub":
-                this.DivSubMake(sec_obj);
-                break;
-            case "Text":
-                this.DivTextMake(sec_obj);
-                break;
+    this.DivNodeMake = function (node_obj) {
+        node_obj.DivMake();
+        //node_obj.Show();
+        this.WrapDiv.appendChild(node_obj.WrapDiv);
+        if (node_obj.SubStat==0)
+            return;
+        for (var i = 0; i < node_obj.NodeAry.length; i++) {
+            this.DivNodeMake(node_obj.NodeAry[i], node_obj.SubStat);
         }
-        this.MsOnSet(sec_obj);
-        this.MsDnSet(sec_obj);
-        this.WrapDiv.appendChild(sec_obj.Div);
     }
     
 
-    obj.DivMake = function () {
+    this.DivMake = function () {
         var div;
-        div=document.createElement('div');
-        div.style.cssText = this.WrapCss.Make();
+        div = document.createElement('div');
+        div.style.cssText = this.CssStrGet();
         this.WrapDiv = div;
 
-        for (var i = 0; i < this.SecAry.length; i++) {
-            var sec_obj = this.SecAry[i];
-            this.DivSecMake(sec_obj);
+        for (var i = 0; i < this.NodeAry.length; i++) {
+            this.DivNodeMake(this.NodeAry[i]);
         }
-        return this.WrapDiv;
     }
-
-    obj.WrapCssInit();
-    return obj;
 }
 DwxUiTree.DemoLoad = function () {
     var div = document.createElement('div');
-    div.innerHTML = "adsfasdfasdfaf";
+    div.innerHTML = "DwxUiTreeDemoBegin";
     document.body.appendChild(div);
 
-    var test = DwxUiTree.ObjInit();
-    test.WrapCss.Fix("display", "block");
-    test.SecAdd("Img", "ftv2node.gif", 0);
-    test.SecAdd("Sub", 1, 0);
-    test.SecAdd("Check", 1, 1);
-    test.SecAdd("Text", "Level 0", 2);
-    test.DivMake();
-    document.body.appendChild(test.WrapDiv);
-    var test = DwxUiTree.ObjInit();
-    test.WrapCss.Fix("display", "block");
-    test.SecAdd("Sub", 0, 0);
-    test.SecAry[0].Css.Fix("margin",sprintf("0 %spx 0 0",Int2Str(test.FontSize)));
-    test.SecAdd("Check", 1, 1);
-    test.SecAdd("Text", "Level 1", 2);
+    var test = new DwxUiTree();
+    test.NodeAdd(0, -1, "0-0","Level 0 - 0");
+    test.NodeAdd(0, -1, "0-1", "Level 0 - 1");
+    test.NodeAdd(0, -1, "0-2", "Level 0 - 2");
+    test.NodeAdd(test.NodeAry[1], -1, "0-1-0", "Level 0 - 1 - 0");
+    test.NodeAdd(test.NodeAry[1], -1, "0-1-1", "Level 0 - 1 - 1");
+    test.PreMake();
     test.DivMake();
     document.body.appendChild(test.WrapDiv);
 
     var div = document.createElement('div');
-    div.innerHTML = "adsfasdfasdfaf\u4e01";
+    div.innerHTML = "DwxUiTreeDemoEnd";
     document.body.appendChild(div);
 
   

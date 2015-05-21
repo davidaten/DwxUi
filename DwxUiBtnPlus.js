@@ -11,6 +11,11 @@ DwxUiBtnPlus = function () {
         this.CssAttSet("box-sizing", "border-box");
         this.CssAttSet("display", "inline-block");
         this.CssAttSet("vertical-align", "middle");
+        if (Hidden) {
+            this.CssAttSet("position", "fixed");
+            this.CssAttSet("top", "-9999px");
+            this.CssAttSet("left", "-9999px");
+        }
     };
     this.WrapCssSet();
 

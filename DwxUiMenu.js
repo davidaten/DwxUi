@@ -40,7 +40,8 @@ DwxUiMenu = function () {
         if (text) {
             btn_obj.SecAdd("Text", text, text);
         }
-        btn_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, item_obj);        item_obj.BtnObj = btn_obj;
+        btn_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, item_obj);
+        item_obj.BtnObj = btn_obj;
         //item_obj.prototype.WrapDiv=btn_obj.WrapDiv;
         //item_obj.BtnObj = DwxUiBtnPlus.ObjInit();
         this.ItemAry.push(item_obj);
