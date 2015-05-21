@@ -40,4 +40,23 @@ function DwxUiDiv() {
         }
         return str;
     }
+    this.Show = function (on_off) {
+        if (on_off == 0) {
+            this.ShowSaved = [];
+            this.ShowSaved.push(this.WrapDiv.style.position);
+            this.ShowSaved.push(this.WrapDiv.style.top);
+            this.ShowSaved.push(this.WrapDiv.style.left);
+            this.WrapDiv.style.position = "fixed";
+            this.WrapDiv.style.top = "-9999px";
+            this.WrapDiv.style.left = "-9999px";
+        }
+        else {
+            if (!this.ShowSaved)
+                return;
+            this.WrapDiv.style.position = this.ShowSaved[0];
+            this.WrapDiv.style.top = this.ShowSaved[1];
+            this.WrapDiv.style.left = this.ShowSaved[2];
+            delete this.ShowSaved;
+        }
+    }
 }

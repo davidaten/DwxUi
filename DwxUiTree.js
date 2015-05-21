@@ -59,12 +59,50 @@ DwxUiTree = function () {
         node_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, node_obj);
     }
 
-    this.PreMake = function () {
-
-        for (var i = 0; i < this.NodeAry.length; i++) {
-            this.NodePreMake(this.NodeAry[i]);
+    this.NodeAryShowChg = function(node_ary, show_stat) {
+        for (var i = 0; i < node_ary.length; i++) {
+            node_ary[i].Show(show_stat);
+            this.NodeAryShowChg(node_ary[i].NodeAry, show_stat);
         }
+    };
+    this.NodeSubChg = function (node_obj, sub_stat) {
+        if (!node_obj.SubOn)
+            return;
+        if (node_obj.SubStat==sub_stat) 
+            return;
+        if (node_obj.SubStat) {
+            node_obj.SubStat = 0;
+            node_obj.SecAry[node_obj.SubPos].Value = 1;
+        }
+        else {
+            node_obj.SubStat = 1;
+            node_obj.SecAry[node_obj.SubPos].Value = 2;
+        }
+        var old=node_obj.WrapDiv;
+        node_obj.DivMake();
+        old.parentElement.replaceChild(node_obj.WrapDiv,old);
+        this.NodeAryShowChg(node_obj.NodeAry, sub_stat);
     }
+    this.NodeChkChg = function (node_obj, chk_stat) {
+        if (!node_obj.ChkOn)
+            return;
+        if (node_obj.ChkStat == chk_stat)
+            return;
+        if (node_obj.ChkStat) {
+            node_obj.ChkStat = 0;
+            node_obj.SecAry[node_obj.ChkPos].Value = 0;
+        }
+        else {
+            node_obj.ChkStat = 1;
+            node_obj.SecAry[node_obj.ChkPos].Value = 1;
+        }
+        var old = node_obj.WrapDiv;
+        node_obj.DivMake();
+        old.parentElement.replaceChild(node_obj.WrapDiv, old);
+        for (var i = 0; i < node_obj.NodeAry.length;i++)
+            this.NodeChkChg(node_obj.NodeAry[i], chk_stat); 
+    }
+
 
     this.NodePreMake = function (node_obj) {
 
@@ -107,55 +145,81 @@ DwxUiTree = function () {
             if (!res) return;
         }
      
-        var upd=0;
+
         switch (sec_obj.Tag) {
             case "sub":
                 if (node_obj.NodeAry.length == 0)
                     break;
-                if (node_obj.SubStat)
-                    node_obj.SubStat = 0;
-                else
-                    node_obj.SubStat = 1;
-                upd = 1;
+                var stat = 0;
+                if (node_obj.SubStat==0 )
+                    stat = 1;
+                cb_obj.NodeSubChg(node_obj,stat);
                 break;
             case "chk":
-                if (node_obj.ChkStat)
-                    node_obj.ChkStat = 0;
-                else
-                    node_obj.ChkStat = 1;
-                upd = 1;
+                var stat = 0;
+                if (node_obj.ChkStat == 0)
+                    stat = 1;
+                cb_obj.NodeChkChg(node_obj, stat);
                 break;
             case "txt":
                 break;
         };
-        if (upd == 0)
-            return;
-        var old = cb_obj.WrapDiv;
-        cb_obj.PreMake();
-        cb_obj.DivMake();
-        old.parentElement.replaceChild(cb_obj.WrapDiv, old);
+        return;
     }
 
-    this.DivNodeMake = function (node_obj) {
+   
+    this.PreNodeMake = function (node_obj) {
+
+        node_obj.CssAttSet("display", "block");
+        node_obj.SecWidth = 16;
+        node_obj.SecAry = [];
+        //node_obj.NodeAry.length = 0;
+        if (node_obj.SubOn) {
+            for (var i = 0; i < node_obj.UpCnt; i++)
+                node_obj.SecAdd("Sub", 0, "sub0");
+            node_obj.SubPos = node_obj.SecAry.length;
+            if (node_obj.NodeAry.length > 0) {
+                if (node_obj.SubStat)
+                    node_obj.SecAdd("Sub", 2, "sub");
+                else
+                    node_obj.SecAdd("Sub", 1, "sub");
+            }
+            else
+                node_obj.SecAdd("Sub", 0, "sub0");
+        }
+        if (node_obj.ChkOn) {
+            node_obj.ChkPos = node_obj.SecAry.length;
+            if (node_obj.ChkStat)
+                node_obj.SecAdd("Check", 0, "chk");
+            else
+                node_obj.SecAdd("Check", 1, "chk");
+        }
+        node_obj.SecAdd("Text", node_obj.Text, "txt");
+
+        for (var i = 0; i < node_obj.NodeAry.length; i++) {
+            this.PreNodeMake(node_obj.NodeAry[i]);
+        }
+    }
+    //Must to call this to init all node_objs' SecAry
+    this.PreMake = function () {
+        for (var i = 0; i < this.NodeAry.length; i++) {
+            this.PreNodeMake(this.NodeAry[i], 1);
+        }
+    }    this.DivNodeMake = function (node_obj, show_on) {
         node_obj.DivMake();
-        //node_obj.Show();
+        node_obj.Show(show_on);
         this.WrapDiv.appendChild(node_obj.WrapDiv);
-        if (node_obj.SubStat==0)
-            return;
         for (var i = 0; i < node_obj.NodeAry.length; i++) {
             this.DivNodeMake(node_obj.NodeAry[i], node_obj.SubStat);
         }
-    }
-    
-
-    this.DivMake = function () {
+    }    this.DivMake = function () {
         var div;
         div = document.createElement('div');
         div.style.cssText = this.CssStrGet();
         this.WrapDiv = div;
 
         for (var i = 0; i < this.NodeAry.length; i++) {
-            this.DivNodeMake(this.NodeAry[i]);
+            this.DivNodeMake(this.NodeAry[i], 1);
         }
     }
 }
