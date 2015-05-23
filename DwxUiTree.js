@@ -205,14 +205,17 @@ DwxUiTree = function () {
         for (var i = 0; i < this.NodeAry.length; i++) {
             this.PreNodeMake(this.NodeAry[i], 1);
         }
-    }    this.DivNodeMake = function (node_obj, show_on) {
+    }
+
+    this.DivNodeMake = function (node_obj, show_on) {
         node_obj.DivMake();
         node_obj.Show(show_on);
         this.WrapDiv.appendChild(node_obj.WrapDiv);
         for (var i = 0; i < node_obj.NodeAry.length; i++) {
             this.DivNodeMake(node_obj.NodeAry[i], node_obj.SubStat);
         }
-    }    this.DivMake = function () {
+    }
+    this.DivMake = function () {
         var div;
         div = document.createElement('div');
         div.style.cssText = this.CssStrGet();
@@ -231,7 +234,7 @@ DwxUiTree.DemoLoad = function () {
     var test = new DwxUiTree();
     test.NodeAdd(0, -1, "0-0","Level 0 - 0");
     test.NodeAdd(0, -1, "0-1", "Level 0 - 1");
-    test.NodeAdd(0, -1, "0-2", "Level 0 - 2");
+    test.NodeAdd(0, -1, "0-2", "Level 0 - 2fdskl;gj;sldfgjs;dfgjs;dfgjs;dfgjs;dlfgjs;dlfgjsdl;fgjsdlf;gjsdflkgjsdflkgjsdflkgjsd;lfkgjsd;lfkgj;sdfg");
     test.NodeAdd(test.NodeAry[1], -1, "0-1-0", "Level 0 - 1 - 0");
     test.NodeAdd(test.NodeAry[1], -1, "0-1-1", "Level 0 - 1 - 1");
     test.PreMake();

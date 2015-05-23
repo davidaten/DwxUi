@@ -16,7 +16,7 @@ DwxUiBtnPlus = function () {
 
     this.SecAry = [];
     this.SecCssSet = function (sec_obj) {
-        sec_obj.CssAttSet("display", "inline-block");
+        sec_obj.CssAttSet("display", "table-cell");
         sec_obj.CssAttSet("box-sizing", "content-box");
         sec_obj.CssAttSet("margin", "0px");
         sec_obj.CssAttSet("border", "0px solid black");
