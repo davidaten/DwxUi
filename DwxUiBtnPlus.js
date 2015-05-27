@@ -21,7 +21,7 @@ DwxUiBtnPlus = function () {
         sec_obj.CssAttSet("margin", "0px");
         sec_obj.CssAttSet("border", "0px solid black");
         sec_obj.CssAttSet("padding", "0px");
-        sec_obj.CssAttSet("vertical-align", "middle");
+        sec_obj.CssAttSet("vertical-align", "top");
         sec_obj.CssAttSet("text-align", "center");
     };
     this.SecAdd = function (type, value, tag) {
@@ -39,6 +39,14 @@ DwxUiBtnPlus = function () {
         return sec_obj;
     }
 
+    this.DivExtMake = function (sec_obj) {
+        var div = document.createElement('div');
+        sec_obj.WrapDiv = div;
+        sec_obj.Value.DivMake();
+        sec_obj.WrapDiv.appendChild(sec_obj.Value.WrapDiv);
+        div.style.cssText = sec_obj.CssStrGet();
+        return div;
+    }
     this.DivImgMake = function (sec_obj) {
         var div = document.createElement('div');
         sec_obj.WrapDiv = div;
@@ -155,6 +163,9 @@ DwxUiBtnPlus = function () {
         if (sec_obj.Hidden)
             return;
         switch (sec_obj.Type) {
+            case "Ext":
+                this.DivExtMake(sec_obj);
+                break;
             case "Img":
                 this.DivImgMake(sec_obj);
                 break;
@@ -170,21 +181,26 @@ DwxUiBtnPlus = function () {
         }
         this.MsOnSet(this, sec_obj);
         this.MsDnSet(this, sec_obj);
-        this.WrapDiv.appendChild(sec_obj.WrapDiv);
+        this.WrapDiv.children[0].children[0].appendChild(sec_obj.WrapDiv);
     }
     
 
     this.DivMake = function () {
         var div;
         div = document.createElement('div');
+        div.style.cssText = this.CssStrGet();
         this.WrapDiv = div;
+        div = document.createElement('div');
+        div.style.cssText = "display: table";
+        this.WrapDiv.appendChild(div);
+        div = document.createElement('div');
+        this.WrapDiv.children[0].appendChild(div);
+        div.style.cssText = "display: table-row";
 
         for (var i = 0; i < this.SecAry.length; i++) {
             var sec_obj = this.SecAry[i];
             this.DivSecMake(sec_obj);
         }
-
-        div.style.cssText = this.CssStrGet();
 
         return this.WrapDiv;
     }

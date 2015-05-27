@@ -57,6 +57,8 @@ DwxUiTree = function () {
         node_obj.ChkStat = this.ChkStatDef; 
 
         node_obj.MsDnCb = CallbackSet(this.MsDnCbFun, this, node_obj);
+
+        return node_obj;
     }
 
     this.NodeAryShowChg = function(node_ary, show_stat) {
@@ -106,13 +108,18 @@ DwxUiTree = function () {
 
     this.NodePreMake = function (node_obj) {
 
-        node_obj.CssAttSet("display", "block");
+        if (this.DirX==0)
+            node_obj.CssAttSet("display", "block");
+        else
+            node_obj.CssAttSet("display", "inline-block");
         node_obj.SecWidth = 16;
         node_obj.SecAry = [];
         //node_obj.NodeAry.length = 0;
-        if (node_obj.SubOn){
-            for (var i = 0; i < node_obj.UpCnt;i++)
-                node_obj.SecAdd("Sub", 0, "sub0");
+        if (node_obj.SubOn) {
+            if (this.DirX == 0) {
+                for (var i = 0; i < node_obj.UpCnt; i++)
+                    node_obj.SecAdd("Sub", 0, "sub0");
+            }
             node_obj.SubPos = node_obj.SecAry.length;
             if (node_obj.NodeAry.length > 0) {
                 if (node_obj.SubStat)
@@ -234,9 +241,13 @@ DwxUiTree.DemoLoad = function () {
     var test = new DwxUiTree();
     test.NodeAdd(0, -1, "0-0","Level 0 - 0");
     test.NodeAdd(0, -1, "0-1", "Level 0 - 1");
-    test.NodeAdd(0, -1, "0-2", "Level 0 - 2fdskl;gj;sldfgjs;dfgjs;dfgjs;dfgjs;dlfgjs;dlfgjsdl;fgjsdlf;gjsdflkgjsdflkgjsdflkgjsd;lfkgjsd;lfkgj;sdfg");
+    test.NodeAdd(0, -1, "0-2", "Level 0 - 2fdskl gj sldfgjs dfgjs dfgjs dfgjs dlfgjs dlfgjsdl fgjsdlf gjsdflkgjsdflkgjsdflkgjsd lfkgjsd lfkgj sdfg") 
     test.NodeAdd(test.NodeAry[1], -1, "0-1-0", "Level 0 - 1 - 0");
     test.NodeAdd(test.NodeAry[1], -1, "0-1-1", "Level 0 - 1 - 1");
+    var menu = new DwxUiMenu();
+    menu.SelectType = 1;
+    menu.DirX = 1;
+    menu.ItemAryAdd(["1fads", "1sfdgsd", "1sdfgsdfgsd"]);
     test.PreMake();
     test.DivMake();
     document.body.appendChild(test.WrapDiv);
