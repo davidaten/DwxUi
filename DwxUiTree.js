@@ -22,37 +22,29 @@ DwxUiTree = function () {
 
     this.ChkOnDef = 1;
     this.ChkStatDef = 0;
+
+    this.SubLevel = 0;
     this.SubOnDef = 1;
     this.SubStatDef = 1;
 
 
     this.NodeAry = [];
-    this.NodeAdd = function (up_obj, pos, tag, text) {
-        var up_ary,up_cnt;
-        if (!up_obj){
-            up_cnt=0;
-            up_ary=this.NodeAry;
-        }
-        else{
-            up_cnt=up_obj.UpCnt+1;
-            up_ary=up_obj.NodeAry;
-        }
-        node_obj = new DwxUiBtnPlus();
-        node_obj.UpCnt = up_cnt;
+    this.NodeAdd = function (pos, tag, text) {
+        var node_obj = new DwxUiBtnPlus();
         if (pos < 0)
-            pos = up_ary.length;
-        up_ary.splice(pos, 0, node_obj);
+            pos = this.NodeAry.length;
+        this.NodeAry.splice(pos, 0, node_obj);
         if (tag)
             node_obj.Tag = tag;
         else
-            node_obj.Tag = node_ary.length;
+            node_obj.Tag = this.NodeAry.length;
         if (text)
             node_obj.Text = text;
         else 
             node_obj.Text = null;
-        node_obj.NodeAry = [];
         node_obj.SubOn = this.SubOnDef;
         node_obj.SubStat = this.SubStatDef;
+        node_obj.SubList = null;
         node_obj.ChkOn = this.ChkOnDef;
         node_obj.ChkStat = this.ChkStatDef; 
 
@@ -60,13 +52,12 @@ DwxUiTree = function () {
 
         return node_obj;
     }
-
-    this.NodeAryShowChg = function(node_ary, show_stat) {
-        for (var i = 0; i < node_ary.length; i++) {
-            node_ary[i].Show(show_stat);
-            this.NodeAryShowChg(node_ary[i].NodeAry, show_stat);
-        }
-    };
+    this.NodeSubSet = function (node_idx, sub_list) {
+        var node_obj = this.NodeAry[node_idx];
+        sub_list.SubLevel = this.SubLevel + 1;
+        node_obj.SubList = sub_list;
+    }
+    //Sub mark change
     this.NodeSubChg = function (node_obj, sub_stat) {
         if (!node_obj.SubOn)
             return;
@@ -82,9 +73,15 @@ DwxUiTree = function () {
         }
         var old=node_obj.WrapDiv;
         node_obj.DivMake();
-        old.parentElement.replaceChild(node_obj.WrapDiv,old);
-        this.NodeAryShowChg(node_obj.NodeAry, sub_stat);
+        if (node_obj.SubList) {
+            //No need to rebuild the Sublist.WrapDiv
+            //node_obj.SubList.DivMake();
+            node_obj.SubList.Show(sub_stat);
+            node_obj.WrapDiv.appendChild(node_obj.SubList.WrapDiv);
+        }
+        old.parentElement.replaceChild(node_obj.WrapDiv, old);
     }
+    //Check mark change
     this.NodeChkChg = function (node_obj, chk_stat) {
         if (!node_obj.ChkOn)
             return;
@@ -100,50 +97,14 @@ DwxUiTree = function () {
         }
         var old = node_obj.WrapDiv;
         node_obj.DivMake();
+        if (node_obj.SubList) {
+            for (var i = 0; i < node_obj.SubList.NodeAry.length; i++)
+                this.NodeChkChg(node_obj.SubList.NodeAry[i], chk_stat);
+            node_obj.WrapDiv.appendChild(node_obj.SubList.WrapDiv);
+        }
         old.parentElement.replaceChild(node_obj.WrapDiv, old);
-        for (var i = 0; i < node_obj.NodeAry.length;i++)
-            this.NodeChkChg(node_obj.NodeAry[i], chk_stat); 
     }
 
-
-    this.NodePreMake = function (node_obj) {
-
-        if (this.DirX==0)
-            node_obj.CssAttSet("display", "block");
-        else
-            node_obj.CssAttSet("display", "inline-block");
-        node_obj.SecWidth = 16;
-        node_obj.SecAry = [];
-        //node_obj.NodeAry.length = 0;
-        if (node_obj.SubOn) {
-            if (this.DirX == 0) {
-                for (var i = 0; i < node_obj.UpCnt; i++)
-                    node_obj.SecAdd("Sub", 0, "sub0");
-            }
-            node_obj.SubPos = node_obj.SecAry.length;
-            if (node_obj.NodeAry.length > 0) {
-                if (node_obj.SubStat)
-                    node_obj.SecAdd("Sub", 2, "sub");
-                else
-                    node_obj.SecAdd("Sub", 1, "sub");
-            }
-            else
-                node_obj.SecAdd("Sub", 0, "sub0");
-        }
-        if (node_obj.ChkOn) {
-            node_obj.ChkPos = node_obj.SecAry.length;
-            if (node_obj.ChkStat)
-                node_obj.SecAdd("Check", 0, "chk");
-            else
-                node_obj.SecAdd("Check", 1, "chk");
-        }
-        node_obj.SecAdd("Text", node_obj.Text, "txt");
-
-        for (var i = 0; i < node_obj.NodeAry.length; i++) {
-            this.NodePreMake(node_obj.NodeAry[i]);
-        }
-    }
-   
     this.MsDnCb = null;
     this.MsDnCbFun = function (cb_obj, node_obj, sec_obj) {
         if (cb_obj.MsDnCb) {
@@ -152,10 +113,9 @@ DwxUiTree = function () {
             if (!res) return;
         }
      
-
         switch (sec_obj.Tag) {
             case "sub":
-                if (node_obj.NodeAry.length == 0)
+                if (node_obj.SubList == 0)
                     break;
                 var stat = 0;
                 if (node_obj.SubStat==0 )
@@ -177,15 +137,22 @@ DwxUiTree = function () {
    
     this.PreNodeMake = function (node_obj) {
 
-        node_obj.CssAttSet("display", "block");
+        if (this.DirX) {
+            node_obj.CssAttSet("display", "inline-block");
+            node_obj.CssAttSet("margin ", sprintf("0px 0px 0px %spx",this.SubLevel*node_obj.SecWidth));
+        }
+        else
+            node_obj.CssAttSet("display", "block");
         node_obj.SecWidth = 16;
         node_obj.SecAry = [];
         //node_obj.NodeAry.length = 0;
         if (node_obj.SubOn) {
-            for (var i = 0; i < node_obj.UpCnt; i++)
-                node_obj.SecAdd("Sub", 0, "sub0");
+            if (this.DirX == 0) {
+                for (var i = 0; i < this.SubLevel; i++)
+                    node_obj.SecAdd("Sub", 0, "sub0");
+            }
             node_obj.SubPos = node_obj.SecAry.length;
-            if (node_obj.NodeAry.length > 0) {
+            if (node_obj.SubList) {
                 if (node_obj.SubStat)
                     node_obj.SecAdd("Sub", 2, "sub");
                 else
@@ -203,9 +170,9 @@ DwxUiTree = function () {
         }
         node_obj.SecAdd("Text", node_obj.Text, "txt");
 
-        for (var i = 0; i < node_obj.NodeAry.length; i++) {
-            this.PreNodeMake(node_obj.NodeAry[i]);
-        }
+        if (!node_obj.SubList)
+            return;
+        node_obj.SubList.PreMake();
     }
     //Must to call this to init all node_objs' SecAry
     this.PreMake = function () {
@@ -214,13 +181,20 @@ DwxUiTree = function () {
         }
     }
 
-    this.DivNodeMake = function (node_obj, show_on) {
+    this.DivNodeMake = function (node_obj) {
         node_obj.DivMake();
-        node_obj.Show(show_on);
+        if (node_obj.SubList) {
+            node_obj.SubList.DivMake();
+            node_obj.WrapDiv.appendChild(node_obj.SubList.WrapDiv);
+            if (node_obj.SubStat == 0)
+                node_obj.SubList.Show(0);
+        };
         this.WrapDiv.appendChild(node_obj.WrapDiv);
+        /*
         for (var i = 0; i < node_obj.NodeAry.length; i++) {
             this.DivNodeMake(node_obj.NodeAry[i], node_obj.SubStat);
         }
+        */
     }
     this.DivMake = function () {
         var div;
@@ -229,7 +203,7 @@ DwxUiTree = function () {
         this.WrapDiv = div;
 
         for (var i = 0; i < this.NodeAry.length; i++) {
-            this.DivNodeMake(this.NodeAry[i], 1);
+            this.DivNodeMake(this.NodeAry[i]);
         }
     }
 }
@@ -238,19 +212,43 @@ DwxUiTree.DemoLoad = function () {
     div.innerHTML = "DwxUiTreeDemoBegin";
     document.body.appendChild(div);
 
-    var test = new DwxUiTree();
-    test.NodeAdd(0, -1, "0-0","Level 0 - 0");
-    test.NodeAdd(0, -1, "0-1", "Level 0 - 1");
-    test.NodeAdd(0, -1, "0-2", "Level 0 - 2fdskl gj sldfgjs dfgjs dfgjs dfgjs dlfgjs dlfgjsdl fgjsdlf gjsdflkgjsdflkgjsdflkgjsd lfkgjsd lfkgj sdfg") 
-    test.NodeAdd(test.NodeAry[1], -1, "0-1-0", "Level 0 - 1 - 0");
-    test.NodeAdd(test.NodeAry[1], -1, "0-1-1", "Level 0 - 1 - 1");
+
+    var listA = new DwxUiTree();
+    listA.DirX = 1;
+    //listA.SubOnDef = 0;
+    listA.NodeAdd(-1, "0-0", "Level A - 0");
+    listA.NodeAdd(-1, "0-1", "Level A - 1");
+    listA.NodeAdd(-1, "0-2", "Level A - 2fdskl gj sldfgjs dfgjs dfgjs dfgjs dlfgjs dlfgjsdl fgjsdlf gjsdflkgjsdflkgjsdflkgjsd lfkgjsd lfkgj sdfg");
+
+    listA.PreMake();
+    listA.DivMake();
+    document.body.appendChild(listA.WrapDiv);
+
+    var list0 = new DwxUiTree();
+    list0.NodeAdd(-1, "0-0","Level 0 - 0");
+    list0.NodeAdd(-1, "0-1", "Level 0 - 1");
+    list0.NodeAdd(-1, "0-2", "Level 0 - 2fdskl gj sldfgjs dfgjs dfgjs dfgjs dlfgjs dlfgjsdl fgjsdlf gjsdflkgjsdflkgjsdflkgjsd lfkgjsd lfkgj sdfg")
+    var list1 = new DwxUiTree();
+    list1.NodeAdd(-1, "0-1-0", "Level 0 - 1 - 0");
+    list1.NodeAdd(-1, "0-1-1", "Level 0 - 1 - 1");
+    list0.NodeSubSet(1, list1);
+
+    listA = new DwxUiTree();
+    listA.DirX = 1;
+    //listA.SubOnDef = 0;
+    listA.NodeAdd(-1, "0-0-0", "Level 0 - 0 - 0");
+    listA.NodeAdd(-1, "0-0-1", "Level 0 - 0 - 1");
+    listA.NodeAdd(-1, "0-0-2", "Level 0 - 0 - 2fdskl gj sldfgjs dfgjs dfgjs dfgjs dlfgjs dlfgjsdl fgjsdlf gjsdflkgjsdflkgjsdflkgjsd lfkgjsd lfkgj sdfg");
+    list0.NodeSubSet(0, listA);
+    /*
     var menu = new DwxUiMenu();
     menu.SelectType = 1;
     menu.DirX = 1;
     menu.ItemAryAdd(["1fads", "1sfdgsd", "1sdfgsdfgsd"]);
-    test.PreMake();
-    test.DivMake();
-    document.body.appendChild(test.WrapDiv);
+    */
+    list0.PreMake();
+    list0.DivMake();
+    document.body.appendChild(list0.WrapDiv);
 
     var div = document.createElement('div');
     div.innerHTML = "DwxUiTreeDemoEnd";
